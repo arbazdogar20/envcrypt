@@ -1,0 +1,19 @@
+import { Navbar } from "@/components/landing/navbar";
+import { Hero } from "@/components/landing/hero";
+import { Terminal } from "@/components/landing/terminal";
+import { Features } from "@/components/landing/features";
+import { Pricing } from "@/components/landing/pricing";
+import { Footer } from "@/components/landing/footer";
+
+export default function LandingPage() {
+  return (
+    <div className="min-h-screen bg-white">
+      <Navbar />
+      <Hero />
+      <Terminal />
+      <Features />
+      <Pricing />
+      <Footer />
+    </div>
+  );
+}
