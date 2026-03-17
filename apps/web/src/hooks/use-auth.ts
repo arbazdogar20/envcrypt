@@ -18,7 +18,7 @@ export function useLogin() {
       router.push("/dashboard");
       toast.success("Welcome back!");
     },
-    onError: () => toast.error("Invalid email or password"),
+    onError: () => toast.error("Login failed. Check your credentials."),
   });
 }
 
