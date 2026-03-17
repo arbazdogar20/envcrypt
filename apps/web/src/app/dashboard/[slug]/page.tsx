@@ -58,18 +58,18 @@ export default function ProjectPage() {
           </h1>
           <p className="text-sm text-gray-500 mt-0.5">Environment variables</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-black">
           <Link
             href={`/dashboard/${slug}/members`}
-            className="flex items-center gap-1.5 text-sm px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-1.5 text-sm px-3 py-2 border border-gray-400 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <Users size={14} />
             Members
           </Link>
-          {/* ✅ AUDIT LOG BUTTON — added here */}
+
           <Link
             href={`/dashboard/${slug}/audit`}
-            className="flex items-center gap-1.5 text-sm px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-1.5 text-sm px-3 py-2 border border-gray-400 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <Shield size={14} />
             Audit log
@@ -77,7 +77,7 @@ export default function ProjectPage() {
 
           <button
             onClick={() => setShowValues(!showValues)}
-            className="flex items-center gap-1.5 text-sm px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-1.5 text-sm px-3 py-2 border border-gray-400 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
           >
             {showValues ? <EyeOff size={14} /> : <Eye size={14} />}
             {showValues ? "Hide" : "Reveal"} values
