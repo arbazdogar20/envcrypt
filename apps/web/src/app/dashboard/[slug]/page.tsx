@@ -13,6 +13,8 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
+import { useConfirm } from "@/hooks/use-confirm";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 const ENVIRONMENTS = ["development", "staging", "production"];
 
@@ -28,6 +30,7 @@ export default function ProjectPage() {
   const { data: secrets, isLoading } = useSecrets(slug, env);
   const setSecret = useSetSecret(slug, env);
   const deleteSecret = useDeleteSecret(slug, env);
+  const { confirm, dialogProps } = useConfirm();
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,6 +44,16 @@ export default function ProjectPage() {
         },
       },
     );
+  };
+
+  const handleDeleteSecret = async (secretKey: string) => {
+    const ok = await confirm({
+      title: "Delete secret",
+      message: `Permanently delete "${secretKey}" from ${env}? This cannot be undone.`,
+      confirmLabel: "Delete secret",
+      variant: "danger",
+    });
+    if (ok) deleteSecret.mutate(secretKey);
   };
 
   const handleCopy = (val: string, k: string) => {
@@ -120,8 +133,8 @@ export default function ProjectPage() {
               <input
                 value={key}
                 onChange={(e) => setKey(e.target.value.toUpperCase())}
-                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-gray-900"
-                placeholder="DATABASE_URL"
+                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-gray-900 text-black"
+                placeholder="Ex: DATABASE_URL"
                 required
               />
             </div>
@@ -130,8 +143,8 @@ export default function ProjectPage() {
               <input
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-gray-900"
-                placeholder="postgresql://..."
+                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-gray-900 text-black"
+                placeholder="Ex: postgresql://..."
                 required
               />
             </div>
@@ -140,14 +153,14 @@ export default function ProjectPage() {
             <button
               type="submit"
               disabled={setSecret.isPending}
-              className="bg-gray-900 text-white text-sm px-4 py-1.5 rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors"
+              className="bg-gray-900 text-white text-sm px-4 py-1.5 rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors cursor-pointer"
             >
               {setSecret.isPending ? "Saving..." : "Save"}
             </button>
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="text-sm px-4 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+              className="text-sm px-4 py-1.5 rounded-lg border border-gray-500 hover:bg-gray-50 transition-colors text-black cursor-pointer"
             >
               Cancel
             </button>
@@ -202,10 +215,7 @@ export default function ProjectPage() {
                         )}
                       </button>
                       <button
-                        onClick={() => {
-                          if (confirm(`Delete ${secret.key}?`))
-                            deleteSecret.mutate(secret.key);
-                        }}
+                        onClick={() => handleDeleteSecret(secret.key)}
                         className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
                       >
                         <Trash2 size={13} />
@@ -217,6 +227,19 @@ export default function ProjectPage() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {dialogProps.isOpen && (
+        <ConfirmDialog
+          title={dialogProps.title}
+          message={dialogProps.message}
+          confirmLabel={dialogProps.confirmLabel}
+          cancelLabel={dialogProps.cancelLabel}
+          variant={dialogProps.variant}
+          isLoading={dialogProps.isLoading}
+          onConfirm={dialogProps.onConfirm}
+          onCancel={dialogProps.onCancel}
+        />
       )}
     </div>
   );
