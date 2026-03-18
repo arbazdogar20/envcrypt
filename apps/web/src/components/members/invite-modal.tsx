@@ -86,7 +86,7 @@ export function InviteModal({ slug, onClose }: InviteModalProps) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-black"
               placeholder="teammate@company.com"
               required
               autoFocus
@@ -132,14 +132,14 @@ export function InviteModal({ slug, onClose }: InviteModalProps) {
             <button
               type="submit"
               disabled={invite.isPending}
-              className="flex-1 bg-gray-900 text-white text-sm py-2 rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors font-medium"
+              className="flex-1 bg-gray-900 text-white text-sm py-2 rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors font-medium cursor-pointer"
             >
               {invite.isPending ? "Inviting..." : "Send invite"}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="px-4 text-sm py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+              className="px-4 text-sm py-2 rounded-lg border border-gray-500 hover:bg-gray-50 transition-colors text-black cursor-pointer"
             >
               Cancel
             </button>
