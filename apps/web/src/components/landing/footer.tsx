@@ -23,7 +23,7 @@ export function Footer() {
             Register
           </Link>
           <a
-            href="https://github.com"
+            href="https://github.com/arbazdogar20/envcrypt"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
@@ -31,7 +31,9 @@ export function Footer() {
             GitHub
           </a>
         </div>
-        <p className="text-xs text-gray-400">Built by you · Paris 2026</p>
+        <p className="text-xs text-gray-400">
+          Copyright © {new Date().getFullYear()} All rights reserved
+        </p>
       </div>
     </footer>
   );
