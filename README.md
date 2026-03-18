@@ -86,7 +86,7 @@ envcrypt/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/envcrypt.git
+git clone https://github.com/arbazdogar20/envcrypt.git
 cd envcrypt
 ```
 
@@ -140,7 +140,7 @@ API runs on `http://localhost:3000`.
 
 ```bash
 cd apps/web
-npm run dev -- --port 3001
+npm run dev
 ```
 
 Dashboard runs on `http://localhost:3001`.
@@ -350,5 +350,3 @@ git push origin feature/your-feature
 ## License
 
 MIT — see [LICENSE](./LICENSE) for details.
-
----
