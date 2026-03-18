@@ -10,11 +10,14 @@ import { Plus, Trash2, ChevronRight, FolderLock } from "lucide-react";
 
 import { useMyAuditLogs } from "@/hooks/use-audit";
 import { AuditLog } from "@/components/audit/audit-log";
+import { useConfirm } from "@/hooks/use-confirm";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export default function DashboardPage() {
   const { data: projects, isLoading } = useProjects();
   const createProject = useCreateProject();
   const deleteProject = useDeleteProject();
+  const { confirm, dialogProps } = useConfirm();
 
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
@@ -44,6 +47,17 @@ export default function DashboardPage() {
         .replace(/\s+/g, "-")
         .replace(/[^a-z0-9-]/g, ""),
     );
+  };
+
+  // Replace the delete handler
+  const handleDelete = async (project: any) => {
+    const ok = await confirm({
+      title: "Delete project",
+      message: `Delete "${project.name}"? All secrets in this project will be permanently lost. This cannot be undone.`,
+      confirmLabel: "Delete project",
+      variant: "danger",
+    });
+    if (ok) deleteProject.mutate(project.slug);
   };
 
   if (isLoading) {
@@ -83,7 +97,7 @@ export default function DashboardPage() {
               <input
                 value={name}
                 onChange={(e) => handleNameChange(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-black"
                 placeholder="My App"
                 required
               />
@@ -93,7 +107,7 @@ export default function DashboardPage() {
               <input
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
+                className="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 text-black"
                 placeholder="my-app"
                 required
                 pattern="[a-z0-9-]+"
@@ -104,14 +118,14 @@ export default function DashboardPage() {
             <button
               type="submit"
               disabled={createProject.isPending}
-              className="bg-gray-900 text-white text-sm px-4 py-1.5 rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors"
+              className="bg-gray-900 text-white text-sm px-4 py-1.5 rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors cursor-pointer"
             >
               {createProject.isPending ? "Creating..." : "Create"}
             </button>
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="text-sm px-4 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+              className="text-sm px-4 py-1.5 rounded-lg border border-gray-500 hover:bg-gray-50 transition-colors text-black cursor-pointer"
             >
               Cancel
             </button>
@@ -156,9 +170,9 @@ export default function DashboardPage() {
             </Link>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => {
-                  if (confirm(`Delete ${project.name}?`))
-                    deleteProject.mutate(project.slug);
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(project);
                 }}
                 className="p-1.5 text-gray-400 hover:text-red-500 transition-colors"
               >
@@ -188,6 +202,19 @@ export default function DashboardPage() {
             <AuditLog logs={recentLogs} showUser={false} />
           </div>
         </div>
+      )}
+
+      {dialogProps.isOpen && (
+        <ConfirmDialog
+          title={dialogProps.title}
+          message={dialogProps.message}
+          confirmLabel={dialogProps.confirmLabel}
+          cancelLabel={dialogProps.cancelLabel}
+          variant={dialogProps.variant}
+          isLoading={dialogProps.isLoading}
+          onConfirm={dialogProps.onConfirm}
+          onCancel={dialogProps.onCancel}
+        />
       )}
     </div>
   );
