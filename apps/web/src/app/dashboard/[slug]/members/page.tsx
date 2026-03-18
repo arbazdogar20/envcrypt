@@ -3,7 +3,9 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useProject, useRemoveMember } from "@/hooks/use-projects";
 import { useAuthStore } from "@/store/auth.store";
+import { useConfirm } from "@/hooks/use-confirm";
 import { InviteModal } from "@/components/members/invite-modal";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { UserPlus, Trash2, Crown, Pencil, Eye } from "lucide-react";
 
 const ROLE_CONFIG = {
@@ -55,6 +57,7 @@ export default function MembersPage() {
   const removeMember = useRemoveMember(slug);
   const { user } = useAuthStore();
   const [showInvite, setShowInvite] = useState(false);
+  const { confirm, dialogProps } = useConfirm();
 
   const currentMember = project?.members?.find(
     (m: any) => m.user.id === user?.id,
@@ -62,6 +65,27 @@ export default function MembersPage() {
   const isOwnerOrEditor =
     currentMember?.role === "OWNER" || currentMember?.role === "EDITOR";
   const isOwner = currentMember?.role === "OWNER";
+
+  const handleRemoveMember = async (member: any) => {
+    const ok = await confirm({
+      title: "Remove member",
+      message: `Remove ${member.user.displayName} (${member.user.email}) from this project? They will lose access to all secrets immediately.`,
+      confirmLabel: "Remove member",
+      variant: "danger",
+    });
+    if (ok) removeMember.mutate(member.user.id);
+  };
+
+  const handleLeaveProject = async () => {
+    const ok = await confirm({
+      title: "Leave project",
+      message:
+        "You will lose access to all secrets in this project. This cannot be undone.",
+      confirmLabel: "Leave project",
+      variant: "danger",
+    });
+    if (ok) removeMember.mutate(user?.id ?? "");
+  };
 
   if (isLoading) {
     return (
@@ -75,6 +99,19 @@ export default function MembersPage() {
     <>
       {showInvite && (
         <InviteModal slug={slug} onClose={() => setShowInvite(false)} />
+      )}
+
+      {dialogProps.isOpen && (
+        <ConfirmDialog
+          title={dialogProps.title}
+          message={dialogProps.message}
+          confirmLabel={dialogProps.confirmLabel}
+          cancelLabel={dialogProps.cancelLabel}
+          variant={dialogProps.variant}
+          isLoading={dialogProps.isLoading}
+          onConfirm={dialogProps.onConfirm}
+          onCancel={dialogProps.onCancel}
+        />
       )}
 
       <div>
@@ -99,7 +136,6 @@ export default function MembersPage() {
           )}
         </div>
 
-        {/* Role permissions reference */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           {Object.entries(ROLE_CONFIG).map(([key, config]) => {
             const Icon = config.icon;
@@ -129,7 +165,6 @@ export default function MembersPage() {
           })}
         </div>
 
-        {/* Members list */}
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-100">
             <p className="text-xs font-medium text-gray-400 uppercase tracking-wide">
@@ -184,15 +219,7 @@ export default function MembersPage() {
 
                     {canRemove && (
                       <button
-                        onClick={() => {
-                          if (
-                            confirm(
-                              `Remove ${member.user.displayName} from this project?`,
-                            )
-                          ) {
-                            removeMember.mutate(member.user.id);
-                          }
-                        }}
+                        onClick={() => handleRemoveMember(member)}
                         className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
                         title="Remove member"
                       >
@@ -206,7 +233,6 @@ export default function MembersPage() {
           </div>
         </div>
 
-        {/* Leave project option for non-owners */}
         {!isOwner && (
           <div className="mt-6 p-4 border border-red-100 rounded-xl bg-red-50">
             <p className="text-sm font-medium text-red-700 mb-1">
@@ -216,11 +242,7 @@ export default function MembersPage() {
               You will lose access to all secrets in this project.
             </p>
             <button
-              onClick={() => {
-                if (confirm("Are you sure you want to leave this project?")) {
-                  removeMember.mutate(user?.id ?? "");
-                }
-              }}
+              onClick={handleLeaveProject}
               className="text-sm text-red-600 font-medium border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-100 transition-colors"
             >
               Leave project
